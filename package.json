@@ -7,7 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint src test",
+    "test": "node test/index.js",
+    "validate": "npm ls"
   },
   "keywords": [
     "coins",
@@ -15,5 +17,25 @@
     "email"
   ],
   "author": "Cory Reed <creed@mrn.org>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "async": "^2.0.0-rc.2",
+    "consolidate": "^0.14.0",
+    "inline-css": "^2.2.2",
+    "lodash": "^4.6.1",
+    "node-sass": "^3.4.2",
+    "twig": "^0.8.9"
+  },
+  "devDependencies": {
+    "eslint": "^2.5.3",
+    "eslint-config-airbnb": "^6.2.0",
+    "eslint-plugin-react": "^4.2.3",
+    "pre-commit": "^1.1.2",
+    "tape": "^4.5.1"
+  },
+  "pre-commit": [
+    "lint",
+    "validate",
+    "test"
+  ]
 }
