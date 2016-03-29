@@ -1,4 +1,4 @@
-# COINS Mail
+<img src="https://raw.githubusercontent.com/MRN-Code/coins-mail/master/img/coins-mail@2x.jpg" width="450" height="105" alt="COINS Mail" />
 
 _HTML and text email templates for COINS._
 
