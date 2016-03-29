@@ -1,0 +1,19 @@
+{
+  "name": "coins-mail",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "coins",
+    "mail",
+    "email"
+  ],
+  "author": "Cory Reed <creed@mrn.org>",
+  "license": "MIT"
+}
