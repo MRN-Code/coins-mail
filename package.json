@@ -1,17 +1,28 @@
 {
   "name": "coins-mail",
   "version": "1.0.0",
-  "description": "",
+  "description": "HTML and text email templates for COINS.",
   "main": "src/index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "lint": "eslint src test",
+    "publish-patch": "npm run preversion && npm version patch && git push origin master --tags && npm publish",
+    "publish-minor": "npm run preversion && npm version minor && git push origin master --tags && npm publish",
+    "publish-major": "npm run preversion && npm version major && git push origin master --tags && npm publish",
     "start": "node test/server.js",
     "test": "node test/index.js",
     "validate": "npm ls"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MRN-Code/coins-mail.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MRN-Code/coins-mail/issues"
+  },
+  "homepage": "https://github.com/MRN-Code/coins-mail#readme",
   "keywords": [
     "coins",
     "mail",
