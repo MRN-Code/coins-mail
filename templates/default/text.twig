@@ -1,9 +1,11 @@
-{{greeting|default('')}}
+{% if greeting %}
+  {{ greeting }}
 
-{{messageBody|raw}}
+{% endif %}{{ messageBody|raw }}
 
 About COINS: http://coins.mrn.org
 Login To COINS: http://portal.mrn.org/portals
 Data Exchange: http://coins.mrn.org/dx
+Support: https://coins.zendesk.com/
 
-You are receiving this message because you are a registered COINS user, please contact us if you have any questions
+{{ disclaimerText|default('You are receiving this message because you are a registered COINS user. Please contact us via the SUPPORT link above if you have any questions or feedback.') }}

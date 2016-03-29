@@ -5,5 +5,84 @@
     <meta name="viewport" content="width=device-width" />
   </head>
   <body>
-  </body>
-</html>
+    <table class="body">
+      <tr>
+        <td class="center" align="center" valign="top">
+          <center>
+            <table class="row header">
+              <tr>
+                <td class="center" align="center">
+                  <center>
+
+                    <table class="container" id="banner-container">
+                      <tr>
+                        <td class="wrapper last">
+
+                          <table class="twelve columns">
+                            <tr>
+                              <td>
+                                <!--Note: setting the width to be 100% inline is needed to force the image to render in Gmail/FF)-->
+                                <img src="http://coins.mrn.org/graphics/coins_banner.jpg" style="width:100% !important">
+                              </td>
+                              <td class="expander"></td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </center>
+                </td>
+              </tr>
+            </table>
+            <table class="container" id="main-content">
+              <tr>
+                <td>
+                  <table class="row">
+                    <tr>
+                      <td class="wrapper last">
+                        <table class="twelve columns">
+                          <tr>
+                            <td>
+                              {% if greeting %}
+                                <h1>{{ greeting }}</h1>
+                              {% endif %}
+                              {{ messageBody|raw }}
+                            </td>
+                            <td class="expander"></td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                  <table class="row">
+                    <tr>
+                      <td class="wrapper last">
+                        <table class="twelve columns">
+                          <tr>
+                            <td align="center">
+                              <center>
+                                <p id="footer-menu" style="text-align:center;">
+                                  <a href="https://coins.mrn.org">About</a> |
+                                  <a href="https://portal.mrn.org/portals">COINS Home</a> |
+                                  <a href="https://coins.mrn.org/dx">Data Exchange</a> |
+                                  <a href="https://coins.zendesk.com/hc/en-us">Support</a>
+                                </p>
+                                <p id="disclaimer">{{ disclaimerText|default('You are receiving this message because you are a registered COINS user. Please contact us via the SUPPORT link above if you have any questions or feedback.') }}</p>
+                                </center>
+                              </td>
+                              <td class="expander"></td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    <!-- container end below -->
+                  </td>
+                </tr>
+              </table>
+            </center>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
