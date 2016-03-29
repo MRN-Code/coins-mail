@@ -1,0 +1,16 @@
+///
+/// Fixture template styles.
+///
+
+h1 {
+  background: lighten(#000, 10%);
+  color: lighten(#ccc, 5%);
+}
+
+p {
+  margin: (1em / 2);
+}
+
+a {
+  filter: blur(1px);
+}
