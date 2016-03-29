@@ -8,6 +8,7 @@
   },
   "scripts": {
     "lint": "eslint src test",
+    "start": "node test/server.js",
     "test": "node test/index.js",
     "validate": "npm ls"
   },
@@ -34,6 +35,7 @@
     "eslint": "^2.5.3",
     "eslint-config-airbnb": "^6.2.0",
     "eslint-plugin-react": "^4.2.3",
+    "livereload": "^0.4.1",
     "pre-commit": "^1.1.2",
     "tape": "^4.5.1"
   },
