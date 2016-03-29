@@ -23,18 +23,37 @@ const locals = {
 };
 /* eslint-enable max-len */
 
-function getLivereloadSnippet() {
-  return `
-  <script>
-  document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +
-  ':35729/livereload.js?snipver=1"></' + 'script>')
-  </script>`;
+/**
+ * Get output.
+ *
+ * @param {Object} results Results from `coinsMail`
+ * @returns {string}
+ */
+function getOutput(results) {
+  const style = `
+    background: #fff;
+    box-sizing: border-box;
+    color: #000;
+    font: normal 14px/150% Monaco, monospace;
+    padding: 1em;
+    white-space: pre-line;
+    width: 100%;
+  `.replace(/\s+/g, ' ');
+
+  return `${results.html}
+    <pre style="${style}">${results.text}</pre>
+    <script>
+      document.write(
+        '<script src="http://' + (location.host || 'localhost').split(':')[0] +
+        ':35729/livereload.js?snipver=1"></' + 'script>'
+      )
+    </script>`;
 }
 
 const port = 3000;
 const server = http.createServer((request, response) => {
   coinsMail(locals)
-    .then(results => response.end(results.html + getLivereloadSnippet()))
+    .then(results => response.end(getOutput(results)))
     .catch(error => {
       response.writeHead(500);
       response.end(error.message);
