@@ -51,7 +51,7 @@ tape('validates options :: setup', t => {
 });
 
 tape('validates options', t => {
-  t.plan(8);
+  t.plan(12);
 
   const validOptions = {
     fromLabel: 'Test Application',
@@ -118,6 +118,26 @@ tape('validates options', t => {
       );
     });
 
+  createWith({ sendTime: 'morning' })
+    .then(() => t.fail('resolves with invalid sendTime'))
+    .catch(error => {
+      t.equal(
+        error.details[1].context.key,
+        'sendTime',
+        'rejects with invalid sendTime'
+      );
+    });
+
+  createWith({ sendTime: Date.now() - 60 * 1000 })
+    .then(() => t.fail('resolves with out-of-range sendTime'))
+    .catch(error => {
+      t.equal(
+        error.details[1].context.key,
+        'sendTime',
+        'rejects with out-of-range sendTime'
+      );
+    });
+
   createWith({ subject: '' })
     .then(() => t.fail('resolves with empty subject'))
     .catch(error => {
@@ -140,6 +160,23 @@ tape('validates options', t => {
 
   createWith()
     .then(() => t.pass('resolves with valid options'))
+    .catch(t.end);
+
+  createWith({
+    recipients: [
+      'nidev@mrn.org',
+      'support@mrn.org',
+      'info@mrn.org',
+    ],
+  })
+    .then(() => t.pass('resolves with multiple recipients'))
+    .catch(t.end);
+
+  createMail(TestModel, [
+    assign({}, validOptions),
+    assign({}, validOptions),
+  ])
+    .then(() => t.pass('resolves with multiple options'))
     .catch(t.end);
 });
 
