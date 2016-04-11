@@ -33,9 +33,11 @@
   "dependencies": {
     "async": "^2.0.0-rc.3",
     "autoprefixer": "^6.3.6",
+    "bookshelf": "^0.9.4",
     "consolidate": "^0.14.0",
     "html-minifier": "^1.5.0",
     "inline-css": "^2.2.2",
+    "joi": "^8.0.5",
     "lodash.noop": "^3.0.1",
     "node-sass": "^3.4.2",
     "postcss": "^5.0.19",
@@ -46,8 +48,11 @@
     "eslint": "^2.7.0",
     "eslint-config-airbnb": "^6.2.0",
     "eslint-plugin-react": "^4.3.0",
+    "knex": "^0.10.0",
     "livereload": "^0.4.1",
+    "lodash.assign": "^4.0.7",
     "pre-commit": "^1.1.2",
+    "sinon": "^1.17.3",
     "tape": "^4.5.1"
   },
   "pre-commit": [
