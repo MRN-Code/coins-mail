@@ -15,6 +15,19 @@ const TestModel = bookshelf.Model.extend({
   tableName: 'test_model',
 });
 
+/**
+ * Valid options.
+ *
+ * @const {Object}
+ */
+const validOptions = {
+  fromLabel: 'Test Application',
+  recipients: 'nidev@mrn.org',
+  replyTo: 'nidev@mrn.org',
+  subject: 'Test Subject',
+  templateLocals: {},
+};
+
 tape('validates model', t => {
   t.plan(3);
 
@@ -26,7 +39,6 @@ tape('validates model', t => {
     .then(() => t.fail('resolves with bad model'))
     .catch(() => t.pass('rejects with bad model'));
 
-  // createMail(new BookshelfModel())
   createMail(TestModel)
     .then(() => t.fail('resolves with bad options'))
     .catch(error => {
@@ -53,14 +65,6 @@ tape('validates options :: setup', t => {
 tape('validates options', t => {
   t.plan(12);
 
-  const validOptions = {
-    fromLabel: 'Test Application',
-    recipients: 'nidev@mrn.org',
-    replyTo: 'nidev@mrn.org',
-    subject: 'Test Subject',
-    templateLocals: {},
-  };
-
   function createWith(override) {
     return createMail(
       TestModel,
@@ -72,7 +76,7 @@ tape('validates options', t => {
     .then(() => t.fail('resolves with empty fromLabel'))
     .catch(error => {
       t.equal(
-        error.details[1].context.key,
+        error.details[0].context.key,
         'fromLabel',
         'rejects with empty fromLabel'
       );
@@ -82,7 +86,7 @@ tape('validates options', t => {
     .then(() => t.fail('resolves with empty recipients'))
     .catch(error => {
       t.equal(
-        error.details[1].context.key,
+        error.details[0].context.key,
         'recipients',
         'rejects with empty recipients'
       );
@@ -92,7 +96,7 @@ tape('validates options', t => {
     .then(() => t.fail('resolves with invalid recipients'))
     .catch(error => {
       t.equal(
-        error.details[1].context.key,
+        error.details[0].context.key,
         'recipients',
         'rejects with invalid recipients'
       );
@@ -102,7 +106,7 @@ tape('validates options', t => {
     .then(() => t.fail('resolves with empty replyTo'))
     .catch(error => {
       t.equal(
-        error.details[1].context.key,
+        error.details[0].context.key,
         'replyTo',
         'rejects with empty replyTo'
       );
@@ -112,7 +116,7 @@ tape('validates options', t => {
     .then(() => t.fail('resolves with invalid replyTo'))
     .catch(error => {
       t.equal(
-        error.details[1].context.key,
+        error.details[0].context.key,
         'replyTo',
         'rejects with invalid replyTo'
       );
@@ -122,7 +126,7 @@ tape('validates options', t => {
     .then(() => t.fail('resolves with invalid sendTime'))
     .catch(error => {
       t.equal(
-        error.details[1].context.key,
+        error.details[0].context.key,
         'sendTime',
         'rejects with invalid sendTime'
       );
@@ -132,7 +136,7 @@ tape('validates options', t => {
     .then(() => t.fail('resolves with out-of-range sendTime'))
     .catch(error => {
       t.equal(
-        error.details[1].context.key,
+        error.details[0].context.key,
         'sendTime',
         'rejects with out-of-range sendTime'
       );
@@ -142,7 +146,7 @@ tape('validates options', t => {
     .then(() => t.fail('resolves with empty subject'))
     .catch(error => {
       t.equal(
-        error.details[1].context.key,
+        error.details[0].context.key,
         'subject',
         'rejects with empty subject'
       );
@@ -152,7 +156,7 @@ tape('validates options', t => {
     .then(() => t.fail('resolves with bad templateLocals'))
     .catch(error => {
       t.equal(
-        error.details[1].context.key,
+        error.details[0].context.key,
         'templateLocals',
         'rejects with bad templateLocals'
       );
@@ -160,7 +164,7 @@ tape('validates options', t => {
 
   createWith()
     .then(() => t.pass('resolves with valid options'))
-    .catch(t.end);
+    .catch(() => t.fail('rejects with valid options'));
 
   createWith({
     recipients: [
@@ -170,14 +174,14 @@ tape('validates options', t => {
     ],
   })
     .then(() => t.pass('resolves with multiple recipients'))
-    .catch(t.end);
+    .catch(() => t.fail('rejects with multiple recipients'));
 
   createMail(TestModel, [
     assign({}, validOptions),
     assign({}, validOptions),
   ])
     .then(() => t.pass('resolves with multiple options'))
-    .catch(t.end);
+    .catch(() => t.fail('rejects with multiple options'));
 });
 
 tape('validates options :: teardown', t => {
@@ -185,3 +189,40 @@ tape('validates options :: teardown', t => {
   t.end();
 });
 
+tape('default options', t => {
+  const forgeSpy = sinon.spy(TestModel, 'forge');
+  const saveStub = sinon.stub(TestModel.prototype, 'save');
+
+  saveStub.returns(Promise.resolve());
+
+  t.plan(12);
+
+  createMail(TestModel, validOptions)
+    .then(() => {
+      const args = forgeSpy.firstCall.args[0];
+
+      t.equal(args.disclaimer_text, null, 'sets disclaimer text null');
+      t.ok(args.from_label, validOptions.fromLabel, 'sets from label');
+      t.equal(args.mail_id, null, 'sets mail id null');
+      t.equal(args.menu_link_key, null, 'sets menu link key null');
+      t.deepEqual(
+        args.recipients,
+        { email: [validOptions.recipients] },
+        'sets recipients'
+      );
+      t.equal(args.reply_to_address, validOptions.replyTo, 'sets reply to');
+
+      // TODO: Better send time date check
+      t.ok(typeof args.send_time === 'number', 'sets default send time');
+      t.equal(args.sent, null, 'sets sent null');
+      t.equal(args.study_id, null, 'sets study id null');
+      t.equal(args.subject, validOptions.subject, 'sets subject');
+      t.equal(args.use_coins_template, true, 'sets use coins template true');
+    })
+    .catch(t.end)
+    .then(() => {
+      forgeSpy.restore();
+      saveStub.restore();
+      t.pass('Test teardown');
+    });
+});

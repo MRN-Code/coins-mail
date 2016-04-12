@@ -53,6 +53,7 @@ const mailSchema = joi.object().keys({
  * @param {(string|string[])} options.recipients
  * @param {string} options.replyTo
  * @param {Date} options.sendTime
+ * @param {string} options.subject
  * @returns {Object}
  */
 function optionToAttributes(option) {
@@ -72,6 +73,7 @@ function optionToAttributes(option) {
     send_time: option.sendTime,
     sent: null,
     study_id: null,
+    subject: option.subject,
     use_coins_template: true,
   };
 }
@@ -104,13 +106,10 @@ function createMail(Mail, options) {
   }
 
   // Validate `options`
-  const result = joi.validate(
-    Array.isArray(options) ? options : [options],
-    joi.alternatives().try(
-      mailSchema,
-      joi.array().items(mailSchema)
-    )
-  );
+  // TODO: Figure out how to use joi.alternatives on this
+  const result = Array.isArray(options) ?
+    joi.validate(options, joi.array().items(mailSchema.required())) :
+    joi.validate(options, mailSchema.required());
 
   if (result.error) {
     return Promise.reject(result.error);
