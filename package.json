@@ -13,6 +13,7 @@
     "publish-major": "npm run preversion && npm version major && git push origin master --tags && npm publish",
     "start": "node test/server.js",
     "test": "node test/index.js",
+    "test:coverage": "istanbul cover test/index.js",
     "validate": "npm ls"
   },
   "repository": {
@@ -48,6 +49,7 @@
     "eslint": "^2.7.0",
     "eslint-config-airbnb": "^6.2.0",
     "eslint-plugin-react": "^4.3.0",
+    "istanbul": "^0.4.3",
     "knex": "^0.10.0",
     "livereload": "^0.4.1",
     "lodash.assign": "^4.0.7",
@@ -58,6 +60,6 @@
   "pre-commit": [
     "lint",
     "validate",
-    "test"
+    "test:coverage"
   ]
 }
