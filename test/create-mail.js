@@ -224,37 +224,52 @@ tape('saved values', t => {
 });
 
 tape('sets text template', t => {
-  const templateLocals = [{
-    html: Math.random().toString(),
-    text: Math.random().toString(),
+  const templateOptions = [{
+    templateLocals: {
+      html: Math.random().toString(),
+      text: Math.random().toString(),
+    },
+    templateName: 'my-dope-template',
   }, {
-    one: Math.random().toString(),
-    two: Math.random().toString(),
+    templateLocals: {
+      one: Math.random().toString(),
+      two: Math.random().toString(),
+    },
   }, {
-    bicycles: 'are fun',
-    heart: 'coffees',
+    templateLocals: {
+      bicycles: 'are fun',
+      heart: 'coffees',
+    },
+    templateName: 'greatest-template-ever',
   }];
 
   t.plan(2);
 
-  createMail(TestModel, assign({}, validOptions, {
-    templateLocals: templateLocals[0],
-  }))
+  createMail(TestModel, assign({}, validOptions, templateOptions[0]))
     .then(() => {
       t.ok(
-        templateStub.calledWith(templateLocals[0]),
+        templateStub.calledWithExactly(
+          templateOptions[0].templateName,
+          templateOptions[0].templateLocals
+        ),
         'calls getTemplate with single locals'
       );
 
       /* eslint-disable arrow-body-style */
-      return createMail(TestModel, templateLocals.slice(1).map(locals => {
-        return assign({}, validOptions, { templateLocals: locals });
+      return createMail(TestModel, templateOptions.slice(1).map(option => {
+        return assign({}, validOptions, option);
       }));
       /* eslint-enable arrow-body-style */
     })
     .then(() => {
       t.ok(
-        templateLocals.slice(1).every(local => templateStub.calledWith(local)),
+        (
+          templateStub.calledWithExactly(templateOptions[1].templateLocals) &&
+          templateStub.calledWithExactly(
+            templateOptions[2].templateName,
+            templateOptions[2].templateLocals
+          )
+        ),
         'calls getTemplate with multiple locals'
       );
     })

@@ -22,7 +22,7 @@ const mailSchema = joi.object().keys({
   sendTime: joi.date().min(Date.now() - 100).default(Date.now()),
   subject: joi.string().required(),
   templateLocals: joi.object().required(),
-  templateName: joi.string().default('default'),
+  templateName: joi.string(),
 });
 
 /**
@@ -116,23 +116,33 @@ function createMail(Mail, options) {
   const result = Array.isArray(options) ?
     joi.validate(options, joi.array().items(mailSchema.required())) :
     joi.validate(options, mailSchema.required());
+  const error = result.error;
+  const value = result.value;
 
   /* eslint-disable arrow-body-style */
-  if (result.error) {
-    return Promise.reject(result.error);
-  } else if (Array.isArray(result.value)) {
-    return Promise.all(result.value.map(option => {
-      return template.getTemplate(option.templateLocals);
+  if (error) {
+    return Promise.reject(error);
+  } else if (Array.isArray(value)) {
+    return Promise.all(value.map(option => {
+      return (
+        option.templateName ?
+          template.getTemplate(option.templateName, option.templateLocals) :
+          template.getTemplate(option.templateLocals)
+      );
     }))
       .then(contents => contents.map((content, index) => {
-        return optionToAttributes(assign({}, result.value[index], content));
+        return optionToAttributes(assign({}, value[index], content));
       }))
       .then(attributes => {
         return Promise.all(Mail.collection().add(attributes).invoke('save'));
       });
   }
 
-  return template.getTemplate(result.value.templateLocals)
+  return (
+    value.templateName ?
+      template.getTemplate(value.templateName, value.templateLocals) :
+      template.getTemplate(value.templateLocals)
+  )
     .then(content => {
       return Mail
         .forge(optionToAttributes(assign({}, result.value, content)))
