@@ -189,7 +189,7 @@ tape('validates options :: teardown', t => {
   t.end();
 });
 
-tape('default options', t => {
+tape('saved values', t => {
   const forgeSpy = sinon.spy(TestModel, 'forge');
   const saveStub = sinon.stub(TestModel.prototype, 'save');
 
