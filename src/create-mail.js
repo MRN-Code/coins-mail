@@ -88,18 +88,72 @@ function optionToAttributes(option) {
  * Create mail.
  * @module
  *
+ * @example <caption>Single email</caption>
+ * createMail(MyMailModel, {
+ *   fromLabel: 'Test Application',,
+ *   recipients: [
+ *     'recipient-1@mrn.org',
+ *     'recipeint-2@mrn.org',
+ *     'recipient-3@mrn.org',
+ *     // ...
+ *   ],
+ *   replyTo: 'reply-address@mrn.org',
+ *   sendTime: Date.now() + 24 * 60 * 60 * 1000,
+ *   subject: 'Test Subject',
+ *   templateLocals: {
+ *     html: {
+ *       myHtmlTemplateVar: 'value',
+ *     },
+ *     text: {
+ *       myTextTemplateVar: 'value',
+ *     },
+ *   },
+ *   templateName: 'my-template',
+ * })
+ *   .then(savedModel => console.log(savedModel))
+ *   .catch(error => console.error(error));
+ *
+ * @example <caption>Multiple emails</caption>
+ * createMail(MyMailModel, [{
+ *   fromLabel: 'Test Application 1',
+ *   recipients: 'recipient-1@mrn.org'
+ *   replyTo: 'reply-address@mrn.org',
+ *   subject: 'Test Subject 1',
+ *   templateLocals: // ...
+ * }, {
+ *   fromLabel: 'Test Application 2',
+ *   recipients: 'recipient-2@mrn.org'
+ *   replyTo: 'reply-address@mrn.org',
+ *   subject: 'Test Subject 2',
+ *   templateLocals: // ...
+ * }, {
+ *   fromLabel: 'Test Application 3',
+ *   recipients: 'recipient-3@mrn.org'
+ *   replyTo: 'reply-address@mrn.org',
+ *   subject: 'Test Subject 3',
+ *   templateLocals: // ...
+ * }])
+ *   .then(savedModels => {
+ *     savedModels.forEach(savedModel => console.log(savedModel))
+ *   })
+ *   .catch(error => console.error(error));
+ *
  * @param {BookshelfModel} Mail Wired up bookshelf.js model that backs the
  * `mrs_mail` table
- * @param {(Object|Object[])} options Single mail or colletion of mails to send
- * @property {string} options.fromLabel
+ * @param {(Object|Object[])} options Single mail or collection of mails to
+ * send.
+ * @property {string} options.fromLabel Added to the `from_label` column. This
+ * is typically the name of application sending the email.
  * @property {(string|string[])} options.recipients Single recipient email
- * address or a collection of email addresses
- * @property {string} options.replyTo Email address to 'replyTo'
- * @property {string} options.subject Email subject
- * @property {Object} options.templateLocals
- * @property {Date} [options.sendTime=Date.now()] Time to send the email
+ * address or a collection of email addresses.
+ * @property {string} options.replyTo Email address to use in the email’s
+ * 'reply to' field.
+ * @property {string} options.subject Email’s subject field
+ * @property {Object} options.templateLocals Hash to pass to `getTemplate`. The
+ * keys/values depend on the email template in use (see `options.templateName`).
+ * @property {Date} [options.sendTime=Date.now()] Time to send the email.
  * @property {string} [options.templateName=default] Name of email template to
- * use
+ * use.
  * @returns {Promise} bookshelf.Model
  */
 function createMail(Mail, options) {
