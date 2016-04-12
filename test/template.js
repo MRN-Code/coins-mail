@@ -1,11 +1,11 @@
 'use strict';
 
 const cheerio = require('cheerio');
-const coinsMail = require('../src/template.js');
+const getTemplate = require('../src/template.js').getTemplate;
 const tape = require('tape');
 
 /**
- * Get valid `locals` param for `coinsMail`.
+ * Get valid `locals` param for `template`.
  *
  * @returns {Object}
  */
@@ -21,19 +21,19 @@ function getValidLocals() {
 }
 
 tape('errors', t => {
-  t.throws(coinsMail, 'throws with no args');
-  t.throws(coinsMail.bind('bogus-template'), 'throws with no locals');
+  t.throws(getTemplate, 'throws with no args');
+  t.throws(getTemplate.bind('bogus-template'), 'throws with no locals');
   t.throws(
-    coinsMail.bind('bogus-template', 'bogus-locals'),
+    getTemplate.bind('bogus-template', 'bogus-locals'),
     'throws with non-object locals'
   );
-  t.throws(coinsMail.bind({ text: {} }), 'throws without HTML locals');
-  t.throws(coinsMail.bind({ html: {} }), 'throws without text locals');
+  t.throws(getTemplate.bind({ text: {} }), 'throws without HTML locals');
+  t.throws(getTemplate.bind({ html: {} }), 'throws without text locals');
   t.end();
 });
 
 tape('Promise interface', t => {
-  const mail = coinsMail(getValidLocals());
+  const mail = getTemplate(getValidLocals());
 
   t.plan(3);
 
@@ -50,7 +50,7 @@ tape('Promise interface', t => {
 tape('callback interface', t => {
   t.plan(3);
 
-  coinsMail('default', getValidLocals(), (error, result) => {
+  getTemplate('default', getValidLocals(), (error, result) => {
     if (error) {
       t.fail(error);
     } else {
@@ -58,7 +58,7 @@ tape('callback interface', t => {
       t.ok('html' in result, 'returns HTML');
     }
   });
-  coinsMail(getValidLocals(), (error, result) => {
+  getTemplate(getValidLocals(), (error, result) => {
     if (error) {
       t.fail(error);
     } else {
@@ -80,15 +80,15 @@ tape('integration', t => {
   };
 
   // Setup
-  const originalTemplatesDir = coinsMail.TEMPLATES_DIR;
-  const originalDefaultTemplateDir = coinsMail.DEFAULT_TEMPLATE_DIR;
+  const originalTemplatesDir = getTemplate.TEMPLATES_DIR;
+  const originalDefaultTemplateDir = getTemplate.DEFAULT_TEMPLATE_DIR;
 
-  coinsMail.TEMPLATES_DIR = 'test';
-  coinsMail.DEFAULT_TEMPLATE_DIR = 'fixture-template';
+  getTemplate.TEMPLATES_DIR = 'test';
+  getTemplate.DEFAULT_TEMPLATE_DIR = 'fixture-template';
 
   t.plan(4);
 
-  coinsMail(locals)
+  getTemplate(locals)
     .then(results => {
       const $ = cheerio.load(results.html);
 
@@ -122,7 +122,7 @@ tape('integration', t => {
     .catch(t.end)
     .then(() => {
       // Teardown
-      coinsMail.TEMPLATES_DIR = originalTemplatesDir;
-      coinsMail.DEFAULT_TEMPLATE_DIR = originalDefaultTemplateDir;
+      getTemplate.TEMPLATES_DIR = originalTemplatesDir;
+      getTemplate.DEFAULT_TEMPLATE_DIR = originalDefaultTemplateDir;
     });
 });

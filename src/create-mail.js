@@ -1,7 +1,9 @@
 'use strict';
 
+const assign = require('lodash.assign');
 const BookshelfModel = require('bookshelf/lib/model.js');
 const joi = require('joi');
+const template = require('./template.js');
 
 /**
  * Mail schema.
@@ -47,13 +49,15 @@ const mailSchema = joi.object().keys({
  *   * send_time: Time to send email
  *   * sent: Mail daemon ONLY, populated when mail is sent
  *
- * @param {Object} options
- * @param {string} options.email
- * @param {string} options.fromLabel
+ * @param {Object} option
+ * @param {string} option.email
+ * @param {string} option.fromLabel
+ * @param {string} option.html Email's HTML content
  * @param {(string|string[])} options.recipients
- * @param {string} options.replyTo
- * @param {Date} options.sendTime
- * @param {string} options.subject
+ * @param {string} option.replyTo
+ * @param {Date} option.sendTime
+ * @param {string} option.subject
+ * @param {string} option.text Email's text content
  * @returns {Object}
  */
 function optionToAttributes(option) {
@@ -64,6 +68,7 @@ function optionToAttributes(option) {
   return {
     disclaimer_text: null,
     from_label: option.fromLabel,
+    html_body: option.html,
     mail_id: null,
     menu_link_key: null,
     recipients: {
@@ -74,6 +79,7 @@ function optionToAttributes(option) {
     sent: null,
     study_id: null,
     subject: option.subject,
+    text_body: option.text,
     use_coins_template: true,
   };
 }
@@ -111,15 +117,28 @@ function createMail(Mail, options) {
     joi.validate(options, joi.array().items(mailSchema.required())) :
     joi.validate(options, mailSchema.required());
 
+  /* eslint-disable arrow-body-style */
   if (result.error) {
     return Promise.reject(result.error);
   } else if (Array.isArray(result.value)) {
-    const mails = Mail.collection().add(result.value.map(optionToAttributes));
-
-    return Promise.all(mails.invoke('save'));
+    return Promise.all(result.value.map(option => {
+      return template.getTemplate(option.templateLocals);
+    }))
+      .then(contents => contents.map((content, index) => {
+        return optionToAttributes(assign({}, result.value[index], content));
+      }))
+      .then(attributes => {
+        return Promise.all(Mail.collection().add(attributes).invoke('save'));
+      });
   }
 
-  return Mail.forge(optionToAttributes(result.value)).save();
+  return template.getTemplate(result.value.templateLocals)
+    .then(content => {
+      return Mail
+        .forge(optionToAttributes(assign({}, result.value, content)))
+        .save();
+    });
+  /* eslint-enable arrow-body-style */
 }
 
 module.exports = createMail;

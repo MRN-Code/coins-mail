@@ -39,6 +39,7 @@
     "html-minifier": "^1.5.0",
     "inline-css": "^2.2.2",
     "joi": "^8.0.5",
+    "lodash.assign": "^4.0.7",
     "lodash.noop": "^3.0.1",
     "node-sass": "^3.4.2",
     "postcss": "^5.0.19",
@@ -52,7 +53,6 @@
     "istanbul": "^0.4.3",
     "knex": "^0.10.0",
     "livereload": "^0.4.1",
-    "lodash.assign": "^4.0.7",
     "pre-commit": "^1.1.2",
     "sinon": "^1.17.3",
     "tape": "^4.5.1"

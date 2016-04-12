@@ -10,6 +10,7 @@ const bookshelf = require('bookshelf')();
 const createMail = require('../src/create-mail.js');
 const sinon = require('sinon');
 const tape = require('tape');
+const template = require('../src/template.js');
 
 const TestModel = bookshelf.Model.extend({
   tableName: 'test_model',
@@ -27,6 +28,28 @@ const validOptions = {
   subject: 'Test Subject',
   templateLocals: {},
 };
+
+let forgeSpy;
+let templateStub;
+
+tape('setup', t => {
+  /**
+   * Stub the model's `#save` method so that Bookshelf.js doesn't attempt to
+   * use knex and throw all sorts of errors.
+   */
+  const saveStub = sinon.stub(TestModel.prototype, 'save');
+  templateStub = sinon.stub(template, 'getTemplate');
+  forgeSpy = sinon.spy(TestModel, 'forge');
+
+  saveStub.returns(Promise.resolve());
+  templateStub.returns(Promise.resolve({
+    html: '',
+    text: '',
+  }));
+
+  t.end();
+});
+
 
 tape('validates model', t => {
   t.plan(3);
@@ -48,18 +71,6 @@ tape('validates model', t => {
        */
       t.ok(error.isJoi, 'accepts bookshelf model');
     });
-});
-
-tape('validates options :: setup', t => {
-  /**
-   * Stub the model's `#save` method so that Bookshelf.js doesn't attempt to
-   * use knex and throw all sorts of errors.
-   */
-  const stub = sinon.stub(TestModel.prototype, 'save');
-
-  stub.returns(Promise.resolve());
-
-  t.end();
 });
 
 tape('validates options', t => {
@@ -184,22 +195,12 @@ tape('validates options', t => {
     .catch(() => t.fail('rejects with multiple options'));
 });
 
-tape('validates options :: teardown', t => {
-  TestModel.prototype.save.restore();
-  t.end();
-});
-
 tape('saved values', t => {
-  const forgeSpy = sinon.spy(TestModel, 'forge');
-  const saveStub = sinon.stub(TestModel.prototype, 'save');
-
-  saveStub.returns(Promise.resolve());
-
-  t.plan(12);
+  t.plan(11);
 
   createMail(TestModel, validOptions)
     .then(() => {
-      const args = forgeSpy.firstCall.args[0];
+      const args = forgeSpy.lastCall.args[0];
 
       t.equal(args.disclaimer_text, null, 'sets disclaimer text null');
       t.ok(args.from_label, validOptions.fromLabel, 'sets from label');
@@ -219,10 +220,51 @@ tape('saved values', t => {
       t.equal(args.subject, validOptions.subject, 'sets subject');
       t.equal(args.use_coins_template, true, 'sets use coins template true');
     })
-    .catch(t.end)
-    .then(() => {
-      forgeSpy.restore();
-      saveStub.restore();
-      t.pass('Test teardown');
-    });
+    .catch(t.end);
 });
+
+tape('sets text template', t => {
+  const templateLocals = [{
+    html: Math.random().toString(),
+    text: Math.random().toString(),
+  }, {
+    one: Math.random().toString(),
+    two: Math.random().toString(),
+  }, {
+    bicycles: 'are fun',
+    heart: 'coffees',
+  }];
+
+  t.plan(2);
+
+  createMail(TestModel, assign({}, validOptions, {
+    templateLocals: templateLocals[0],
+  }))
+    .then(() => {
+      t.ok(
+        templateStub.calledWith(templateLocals[0]),
+        'calls getTemplate with single locals'
+      );
+
+      /* eslint-disable arrow-body-style */
+      return createMail(TestModel, templateLocals.slice(1).map(locals => {
+        return assign({}, validOptions, { templateLocals: locals });
+      }));
+      /* eslint-enable arrow-body-style */
+    })
+    .then(() => {
+      t.ok(
+        templateLocals.slice(1).every(local => templateStub.calledWith(local)),
+        'calls getTemplate with multiple locals'
+      );
+    })
+    .catch(t.end);
+});
+
+tape('teardown', t => {
+  TestModel.prototype.save.restore();
+  forgeSpy.restore();
+  templateStub.restore();
+  t.end();
+});
+

@@ -95,11 +95,10 @@ function minifyHtml(html, cb) {
 }
 
 /**
- * COINS Mail.
- * @module
+ * Get getTemplate.
  *
  * @example
- * coinsMail({
+ * template({
  *   html: {
  *     myHtmlTemplateVar: '<h1>Hi!</h1> <p>Insert this html…</p>',
  *   },
@@ -122,13 +121,13 @@ function minifyHtml(html, cb) {
  * @param {Function} [callback] Optional callback with Node-style arguments
  * @returns {Promise}
  */
-function coinsMail(templateName, locals, callback) {
+function getTemplate(templateName, locals, callback) {
   let _callback;
   let _locals;
   let _templateName;
 
   if (templateName instanceof Object) {
-    _templateName = coinsMail.DEFAULT_TEMPLATE_DIR;
+    _templateName = getTemplate.DEFAULT_TEMPLATE_DIR;
     _locals = templateName;
 
     if (locals instanceof Function) {
@@ -163,7 +162,7 @@ function coinsMail(templateName, locals, callback) {
   }
 
   const templatePath = path.resolve(
-    __dirname, '..', coinsMail.TEMPLATES_DIR, _templateName
+    __dirname, '..', getTemplate.TEMPLATES_DIR, _templateName
   );
 
   return new Promise((resolve, reject) => {
@@ -176,7 +175,7 @@ function coinsMail(templateName, locals, callback) {
                 async.waterfall([
                   cb1a1a => {
                     fs.readFile(
-                      path.join(templatePath, coinsMail.SASS_FILENAME),
+                      path.join(templatePath, getTemplate.SASS_FILENAME),
                       'utf-8',
                       cb1a1a
                     );
@@ -187,7 +186,7 @@ function coinsMail(templateName, locals, callback) {
               },
               html: cb1a2 => {
                 cons.twig(
-                  path.join(templatePath, coinsMail.HTML_FILENAME),
+                  path.join(templatePath, getTemplate.HTML_FILENAME),
                   _locals.html,
                   cb1a2
                 );
@@ -206,7 +205,7 @@ function coinsMail(templateName, locals, callback) {
       },
       text: cb2 => {
         cons.twig(
-          path.join(templatePath, coinsMail.TEXT_FILENAME),
+          path.join(templatePath, getTemplate.TEXT_FILENAME),
           _locals.text,
           cb2
         );
@@ -230,34 +229,40 @@ function coinsMail(templateName, locals, callback) {
  *
  * @property {string}
  */
-coinsMail.TEMPLATES_DIR = 'templates';
+getTemplate.TEMPLATES_DIR = 'templates';
 
 /**
  * Default template directory.
  *
  * @property {string}
  */
-coinsMail.DEFAULT_TEMPLATE_DIR = 'default';
+getTemplate.DEFAULT_TEMPLATE_DIR = 'default';
 
 /**
  * HTML filename.
  *
  * @property {string}
  */
-coinsMail.HTML_FILENAME = 'html.twig';
+getTemplate.HTML_FILENAME = 'html.twig';
 
 /**
  * Sass filename.
  *
  * @property {string}
  */
-coinsMail.SASS_FILENAME = 'styles.scss';
+getTemplate.SASS_FILENAME = 'styles.scss';
 
 /**
  * Text filename.
 
  * @property {string}
  */
-coinsMail.TEXT_FILENAME = 'text.twig';
+getTemplate.TEXT_FILENAME = 'text.twig';
 
-module.exports = coinsMail;
+/**
+ * Export `getTemplate` as object to make testing easier.
+ */
+module.exports = {
+  getTemplate: getTemplate, // eslint-disable-line object-shorthand
+};
+
