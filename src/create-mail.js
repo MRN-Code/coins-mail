@@ -26,6 +26,22 @@ const mailSchema = joi.object().keys({
 });
 
 /**
+ * Do get template.
+ *
+ * Fire template#getTemplate with a template name if present.
+ *
+ * @param {Object} option
+ * @param {Object} option.templateLocals
+ * @param {string} [option.templateName]
+ * @returns {Promise} Result of template#getTemplate
+ */
+function doGetTemplate(option) {
+  return option.templateName ?
+    template.getTemplate(option.templateName, option.templateLocals) :
+    template.getTemplate(option.templateLocals);
+}
+
+/**
  * Map option to attributes.
  *
  * This maps author-friendly parameters to column names in `mrs_mail`. Table
@@ -50,7 +66,6 @@ const mailSchema = joi.object().keys({
  *   * sent: Mail daemon ONLY, populated when mail is sent
  *
  * @param {Object} option
- * @param {string} option.email
  * @param {string} option.fromLabel
  * @param {string} option.html Email's HTML content
  * @param {(string|string[])} options.recipients
@@ -58,7 +73,7 @@ const mailSchema = joi.object().keys({
  * @param {Date} option.sendTime
  * @param {string} option.subject
  * @param {string} option.text Email's text content
- * @returns {Object}
+ * @returns {Object} Attributes matching `mrs_mail`’s column names
  */
 function optionToAttributes(option) {
   const email = Array.isArray(option.recipients) ?
@@ -139,7 +154,7 @@ function optionToAttributes(option) {
  *   .catch(error => console.error(error));
  *
  * @param {BookshelfModel} Mail Wired up bookshelf.js model that backs the
- * `mrs_mail` table
+ * `mrs_mail` table.
  * @param {(Object|Object[])} options Single mail or collection of mails to
  * send.
  * @property {string} options.fromLabel Added to the `from_label` column. This
@@ -147,14 +162,17 @@ function optionToAttributes(option) {
  * @property {(string|string[])} options.recipients Single recipient email
  * address or a collection of email addresses.
  * @property {string} options.replyTo Email address to use in the email’s
- * 'reply to' field.
- * @property {string} options.subject Email’s subject field
+ * “reply to” field.
+ * @property {string} options.subject Email’s subject field.
  * @property {Object} options.templateLocals Hash to pass to `getTemplate`. The
  * keys/values depend on the email template in use (see `options.templateName`).
  * @property {Date} [options.sendTime=Date.now()] Time to send the email.
  * @property {string} [options.templateName=default] Name of email template to
- * use.
- * @returns {Promise} bookshelf.Model
+ * use. {@see template#getTemplate}
+ * @returns {Promise} Resolves to a Bookshelf.js model or collection. This is
+ * the result of calling `bookshelf.Model#save` if `options` is singular or the
+ * result of invoking `save` if `options` is a collection.
+ * {@link http://bookshelfjs.org/#Model-instance-save}
  */
 function createMail(Mail, options) {
   if (
@@ -166,7 +184,6 @@ function createMail(Mail, options) {
   }
 
   // Validate `options`
-  // TODO: Figure out how to use joi.alternatives on this
   const result = Array.isArray(options) ?
     joi.validate(options, joi.array().items(mailSchema.required())) :
     joi.validate(options, mailSchema.required());
@@ -177,13 +194,7 @@ function createMail(Mail, options) {
   if (error) {
     return Promise.reject(error);
   } else if (Array.isArray(value)) {
-    return Promise.all(value.map(option => {
-      return (
-        option.templateName ?
-          template.getTemplate(option.templateName, option.templateLocals) :
-          template.getTemplate(option.templateLocals)
-      );
-    }))
+    return Promise.all(value.map(doGetTemplate))
       .then(contents => contents.map((content, index) => {
         return optionToAttributes(assign({}, value[index], content));
       }))
@@ -192,16 +203,11 @@ function createMail(Mail, options) {
       });
   }
 
-  return (
-    value.templateName ?
-      template.getTemplate(value.templateName, value.templateLocals) :
-      template.getTemplate(value.templateLocals)
-  )
-    .then(content => {
-      return Mail
-        .forge(optionToAttributes(assign({}, result.value, content)))
-        .save();
-    });
+  return doGetTemplate(value).then(content => {
+    return Mail
+      .forge(optionToAttributes(assign({}, value, content)))
+      .save();
+  });
   /* eslint-enable arrow-body-style */
 }
 
