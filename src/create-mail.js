@@ -46,7 +46,6 @@ function doGetTemplate(option) {
  * This maps author-friendly parameters to column names in `mrs_mail`. Table
  * columns:
  *
- *   * mail_id: serial (auto)
  *   * study_id: unused
  *   * use_coins_template: `true` for everything
  *   * from_label: Place of mail origin (ex: "Participant Portal"), not used in
@@ -83,7 +82,6 @@ function optionToAttributes(option) {
     disclaimer_text: null,
     from_label: option.fromLabel,
     html_body: option.html,
-    mail_id: null,
     menu_link_key: null,
     recipients: {
       email: email, // eslint-disable-line object-shorthand
