@@ -35,7 +35,6 @@
   "dependencies": {
     "async": "^2.0.0-rc.3",
     "autoprefixer": "^6.3.6",
-    "bookshelf": "^0.9.4",
     "consolidate": "^0.14.0",
     "html-minifier": "^1.5.0",
     "inline-css": "^2.2.2",
@@ -47,6 +46,7 @@
     "twig": "^0.8.9"
   },
   "devDependencies": {
+    "bookshelf": "^0.9.4",
     "cheerio": "^0.20.0",
     "eslint": "^2.7.0",
     "eslint-config-airbnb": "^6.2.0",

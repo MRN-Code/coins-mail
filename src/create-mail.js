@@ -1,7 +1,6 @@
 'use strict';
 
 const assign = require('lodash.assign');
-const BookshelfModel = require('bookshelf/lib/model.js');
 const joi = require('joi');
 const template = require('./template.js');
 
@@ -178,7 +177,7 @@ function createMail(Mail, options) {
   if (
     !Mail ||
     !(Mail instanceof Object) ||
-    !(Mail.prototype instanceof BookshelfModel)
+    (Mail.prototype && !('save' in Mail.prototype))
   ) {
     return Promise.reject(new Error('Expected Mail to be a model'));
   }
