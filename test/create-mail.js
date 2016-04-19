@@ -196,7 +196,7 @@ tape('validates options', t => {
 });
 
 tape('saved values', t => {
-  t.plan(11);
+  t.plan(10);
 
   createMail(TestModel, validOptions)
     .then(() => {
@@ -204,7 +204,6 @@ tape('saved values', t => {
 
       t.equal(args.disclaimer_text, null, 'sets disclaimer text null');
       t.ok(args.from_label, validOptions.fromLabel, 'sets from label');
-      t.equal(args.mail_id, null, 'sets mail id null');
       t.equal(args.menu_link_key, null, 'sets menu link key null');
       t.deepEqual(
         args.recipients,
