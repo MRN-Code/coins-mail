@@ -48,8 +48,8 @@
   "devDependencies": {
     "bookshelf": "^0.9.4",
     "cheerio": "^0.20.0",
-    "eslint": "^2.7.0",
-    "eslint-config-airbnb": "^6.2.0",
+    "eslint": "^2.8.0",
+    "eslint-config-airbnb": "^7.0.0",
     "eslint-plugin-react": "^4.3.0",
     "istanbul": "^0.4.3",
     "knex": "^0.10.0",
