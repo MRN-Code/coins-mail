@@ -1,6 +1,6 @@
 {
   "name": "coins-mail",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "HTML and text email templates for COINS.",
   "main": "src/index.js",
   "directories": {
