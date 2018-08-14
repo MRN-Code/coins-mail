@@ -1,3 +1,7 @@
+# NOTICE
+This repo was moved into the quarterback mono repo
+https://github.com/MRN-Code/quarterback/tree/master/packages/coins-mail
+
 <img src="https://raw.githubusercontent.com/MRN-Code/coins-mail/master/img/coins-mail@2x.jpg" width="450" height="105" alt="COINS Mail" />
 
 _HTML and text email templates for COINS._
